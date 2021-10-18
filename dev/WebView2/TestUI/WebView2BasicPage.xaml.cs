@@ -196,6 +196,8 @@ namespace MUXControlsTestApp
             CloseThenDPIChangeTest,
             AddHostObjectToScriptTest,
             UserAgentTest,
+            KeyboardAcceleratorTest,
+            AccessKeyTest,
         };
 
         // Map of TestList entry to its webpage (index in TestPageNames[])
@@ -255,6 +257,8 @@ namespace MUXControlsTestApp
             { TestList.CloseThenDPIChangeTest, 0 },
             { TestList.AddHostObjectToScriptTest, 0 },
             { TestList.UserAgentTest, 0 },
+            { TestList.KeyboardAcceleratorTest, 5 },
+            { TestList.AccessKeyTest, 5 },
         };
 
         readonly string[] TestPageNames =
@@ -658,6 +662,24 @@ namespace MUXControlsTestApp
                         parentBorder.Child = newWebView2;
                         AddWebViewEventHandlers(newWebView2);
                         WebView2Common.LoadWebPage(newWebView2, TestPageNames[TestInfoDictionary[test]]);
+                    }
+                    break;
+                case TestList.KeyboardAcceleratorTest:
+                    {
+                        var f5Accelerator = new KeyboardAccelerator();
+                        f5Accelerator.Key = VirtualKey.F5;
+                        f5Accelerator.Invoked += (sender, args) =>
+                        {
+                            Status2.Text = "F5";
+                        };
+                        MyWebView2.KeyboardAccelerators.Add(f5Accelerator);
+                        WebView2Common.LoadWebPage(MyWebView2, TestPageNames[TestInfoDictionary[test]]);
+                    }
+                    break;
+                case TestList.AccessKeyTest:
+                    {
+                        MyWebView2.AccessKey = "W";
+                        WebView2Common.LoadWebPage(MyWebView2, TestPageNames[TestInfoDictionary[test]]);
                     }
                     break;
                 default:
@@ -1786,6 +1808,14 @@ namespace MUXControlsTestApp
                             // For more information, see https://docs.microsoft.com/en-us/microsoft-edge/web-platform/user-agent-guidance
                             logger.Verify(userAgent.Contains("Edg"),
                                 string.Format("Test {0}: Expected a valid UserAgent, got {1}", selectedTest.ToString(), userAgent));
+                        }
+                        break;
+
+                    case TestList.KeyboardAcceleratorTest:
+                        {
+                            logger.Verify(Status2.Text != "F5",
+                                string.Format("Test {0}: Typing 't' should not have invoked an F5 handler",
+                                    selectedTest.ToString()));
                         }
                         break;
 
